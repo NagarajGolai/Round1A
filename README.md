@@ -1,28 +1,48 @@
 # PDF Outline Extractor using Heuristic Approach
+---
 
-## Overview
+## 📚 Table of Contents
 
-This project provides an automated PDF outline extractor using a heuristic approach. It leverages font size and positioning data from text blocks (via PyMuPDF) to identify hierarchical headings (like Title, H1, H2, H3) and generates structured JSON outlines from raw PDF files. 
+- [🧠 Overview](#-overview)
+- [⚙️ Approach](#️-approach)
+- [🗂 Directory Structure](#-directory-structure)
+- [📦 Dependencies](#-dependencies)
+- [🐳 Docker Setup](#-docker-setup)
+  - [Build Docker Image](#️-build-docker-image)
+  - [Run Docker Container](#-run-docker-container)
+- [📌 Assumptions and Notes](#-assumptions-and-notes)
+- [🛠️ Noteworthy Technical Highlights](#️-noteworthy-technical-highlights)
+- [📚 How to Train Thresholds](#-how-to-train-thresholds)
+- [🔄 How to Extend](#-how-to-extend)
 
-It was built as part of a Hackathon challenge and designed to be:
-- **Accurate** (with tunable heuristics based on training data),
-- **Portable** (via Docker),
-- **Offline-compatible** (no internet required at runtime),
-- **Platform-independent** (tested on macOS and Linux).
+---
 
-## Approach
+## 🧠 Overview
 
-1. **Text Extraction**:  
-   Utilizes `PyMuPDF (fitz)` to extract text blocks along with their font sizes and coordinates.
+This project provides an automated PDF outline extractor using a **heuristic approach**. It analyzes font size and position data from PDFs to infer heading structure and builds structured JSON outlines — no AI/ML required.
 
-2. **Heuristic Training**:  
-   A script (`heuristic_train.py`) processes labeled data (from `training_data.csv`) to compute dynamic font size thresholds for heading levels (Title, H1, H2, H3).
+🧪 Built during a Hackathon, it is:
+- ✅ **Accurate** (tunable via training data)
+- 📦 **Portable** (Docker-ready)
+- 🔌 **Offline-compatible**
+- 💻 **Cross-platform** (macOS, Linux, Windows via WSL2)
 
-3. **Outline Inference**:  
-   The main script (`extract_outline.py`) uses these thresholds to infer and tag headings per page.
+---
 
-4. **Structured Output**:  
-   Produces a clean `JSON` structure with the outline in:
+## ⚙️ Approach
+
+1. **Text Extraction**  
+   Uses `PyMuPDF (fitz)` to extract text blocks with font size and coordinates.
+
+2. **Heuristic Training**  
+   `heuristic_train.py` computes font thresholds using labeled data (`training_data.csv`).
+
+3. **Outline Inference**  
+   `extract_outline.py` tags headings based on thresholds.
+
+4. **Structured Output**  
+   Output is clean JSON like:
+
    ```json
    {
      "title": "Document Title",
@@ -32,9 +52,13 @@ It was built as part of a Hackathon challenge and designed to be:
        { "level": "H3", "text": "Details", "page": 3 }
      ]
    }
+   ```
+
+---
 
 ## 🗂 Directory Structure
 
+```
 Round1A/
 ├── Dockerfile
 ├── heuristic_train.py
@@ -45,22 +69,27 @@ Round1A/
 ├── /input          # Place input PDFs here
 ├── /output         # JSON outputs will be written here
 └── requirements.txt
+```
 
-## Dependencies
+---
+
+## 📦 Dependencies
 
 - Python 3.10
 - PyMuPDF
 - numpy
 
-## 🐳 Docker (Cross-platform: macOS, Linux, Windows with WSL2)
+---
 
-The project includes a Dockerfile to build a containerized environment for easy deployment.
-To build the Docker image (compatible with most systems):
+## 🐳 Docker Setup
+
+### 🛠️ Build Docker Image
 
 ```bash
 docker build --platform linux/amd64 -t pdf-outline-extractor:latest .
+```
 
-## 🐳 Run Docker Container
+### 🚀 Run Docker Container
 
 ```bash
 docker run --rm \
@@ -68,36 +97,51 @@ docker run --rm \
   -v $(pwd)/output:/app/output \
   --network none \
   pdf-outline-extractor:latest
+```
 
-This command works on macOS, Linux, and Windows (via WSL or Git Bash).
-For Windows CMD or PowerShell, replace $(pwd) with the full path (e.g., C:/Users/You/Project/input).
-This command processes all PDFs in the `input` folder and writes JSON outputs to the `output` folder.
+> 💡 This works on **macOS**, **Linux**, and **Windows via WSL or Git Bash**.  
+> 🪟 For **Windows CMD/PowerShell**, replace `$(pwd)` with the full path (e.g., `C:/Users/You/Project/input`).
 
-## Assumptions and Notes
+📤 This command processes all PDFs in the `/input` folder and writes JSON files to `/output`.
 
-- The solution uses a heuristic approach without deep learning models.
-- The solution runs on CPU only.
-- The solution does not make any network calls and runs offline.
-- The processing time for a 50-page PDF should be under 10 seconds on a system with 8 CPUs and 16 GB RAM.
-- The Docker image is based on `python:3.10-slim` with AMD64 platform compatibility.
+---
 
-## Noteworthy Technical Notes
+## 📌 Assumptions and Notes
 
-✅ Works fully offline after build — great for private document processing.
-✅ Automatically adapts to new document styles via the retraining script.
-🚫 Does not require internet for PDF processing (inference).
-✅ Model-free: avoids complex deployment or GPU dependencies.
-🖥️ Compatible with both macOS (M1/M2) and Intel-based systems via Docker’s platform specification.
-🛠️ Custom threshold tuning offers flexibility per document type or style.
-🔒 Docker --network none ensures safe, isolated container runs.
-⏱️ Optimized: <10s processing time for 50-page PDF on 8-core CPU.
+- 🧠 Heuristic logic only — no ML models used.
+- ⚙️ CPU-based, no GPU required.
+- 🚫 No internet dependency during execution.
+- 🚀 Processes 50-page PDFs in under 10 seconds (on 8-core, 16 GB RAM).
+- 🐋 Docker image is based on `python:3.10-slim` with `linux/amd64` compatibility.
 
-## How to Train Thresholds
+---
 
-- Use the `heuristic_train.py` script to compute font size thresholds from the training data CSV (`training_data.csv`).
-- The script outputs `heading_thresholds.json` which is used by the extractor to assign heading levels.
+## 🛠️ Noteworthy Technical Highlights
 
-## How to Extend
+- ✅ Fully offline — ideal for sensitive/secure PDFs  
+- 🔧 Customizable thresholds via retraining script  
+- 🧘 Model-free and GPU-free: simple deployment  
+- 🖥️ Runs on macOS (Intel + M1/M2), Linux, Windows (via WSL2)  
+- 🔒 Isolated Docker execution with `--network none`  
+- ⏱️ Optimized for <10s processing for standard docs
 
-- To prepare training data, use `prepare_training_data.py`.
-docker run --rm -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output --network none pdf-outline-extractor:latest
+---
+
+## 📚 How to Train Thresholds
+
+```bash
+python heuristic_train.py --input training_data.csv --output heading_thresholds.json
+```
+
+- This script analyzes font sizes in labeled data and writes `heading_thresholds.json`.
+
+---
+
+## 🔄 How to Extend
+
+To adapt to new document formats:
+1. Run `prepare_training_data.py` to create or label a CSV.
+2. Retrain thresholds with `heuristic_train.py`.
+3. Replace `heading_thresholds.json` with the updated one.
+
+---
