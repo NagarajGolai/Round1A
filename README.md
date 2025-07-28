@@ -91,12 +91,17 @@ docker build --platform linux/amd64 -t pdf-outline-extractor:latest .
 
 ### 🚀 Run Docker Container
 
-```bash
-docker run --rm \
-  -v $(pwd)/input:/app/input \
-  -v $(pwd)/output:/app/output \
-  --network none \
-  pdf-outline-extractor:latest
+Mac/Linux:
+```
+docker run --rm -v "$(pwd)/input:/app/input" -v "$(pwd)/output:/app/output" round1b-pipeline
+```
+Windows PowerShell:
+```
+docker run --rm -v "${PWD}\input:/app/input" -v "${PWD}\output:/app/output" round1b-pipeline
+```
+Windows CMD:
+```
+docker run --rm -v "%cd%\input:/app/input" -v "%cd%\output:/app/output" round1b-pipeline
 ```
 
 > 💡 This works on **macOS**, **Linux**, and **Windows via WSL or Git Bash**.  
@@ -133,15 +138,6 @@ docker run --rm \
 python heuristic_train.py --input training_data.csv --output heading_thresholds.json
 ```
 
-- This script analyzes font sizes in labeled data and writes `heading_thresholds.json`.
-
 ---
-
-## 🔄 How to Extend
-
-To adapt to new document formats:
-1. Run `prepare_training_data.py` to create or label a CSV.
-2. Retrain thresholds with `heuristic_train.py`.
-3. Replace `heading_thresholds.json` with the updated one.
-
----
+## Note :
+This system runs completely offline once built. However, an internet connection is required only while building the Docker image (to download dependencies). After that, it can be run without internet access.
