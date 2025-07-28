@@ -88,6 +88,10 @@ Round1A/
 ```bash
 docker build --platform linux/amd64 -t pdf-outline-extractor:latest .
 ```
+> ℹ️ **Notes:**
+> - This system runs **entirely offline** after the Docker image is built.
+> - An **internet connection is required only during the image build process** to download required packages and dependencies.
+> - The **`ideal_output/` folder (training data)** is **only needed while building** the Docker image. After building, you can **safely delete the training files**, and the pipeline will still work correctly during execution.
 
 ### 🚀 Run Docker Container
 
